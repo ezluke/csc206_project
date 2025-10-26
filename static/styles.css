@@ -1,0 +1,37 @@
+@import "https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css";
+
+.site {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+.site-content {
+    flex: 1;
+}
+
+.navbar {
+    height: 112px
+}
+
+.logo {
+    width: 110px;
+    height: 110px;
+    padding: 10px;
+    border-radius: 20%;
+    object-fit: contain;
+    max-height: none;
+}
+
+.navbar-brand .navbar-item img {
+    max-height: none;
+}
+
+.option {
+    padding-left: 60px;
+    padding-right: 60px;
+}
+
+.card {
+    margin: 20px;
+}
