@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ title or 'Car Retail' }}{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- Bulma CSS (CDN) - used by templates for layout and form styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body class="site">
+<header>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="{{ url_for('home') }}">
+                <img class="logo" src="{{ url_for('static', filename='logo.png') }}" alt="Car Retail Logo">
+            </a>
+        </div>
+        <div class="navbar-start">
+            <a href="{{ url_for('home') }}" class="navbar-item option">Home</a>
+            <a href="{{ url_for('cars') }}" class="navbar-item option">Cars</a>
+            <a href="{{ url_for('parts') }}" class="navbar-item option">Parts</a>
+            <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">Reports</a>
+                <div class="navbar-dropdown">
+                    <a class="navbar-item" href="{{ url_for('sales_productivity_report') }}">Sales Productivity</a>
+                    <a class="navbar-item" href="{{ url_for('seller_history_report') }}">Seller History</a>
+                    <a class="navbar-item" href="{{ url_for('part_statistics_report') }}">Part Statistics</a>
+                </div>
+            </div>
+            <a href="{{ url_for('sell_car') }}" class="navbar-item option">Sell Car</a>
+            <a href="{{ url_for('sell_part') }}" class="navbar-item option">Sell Part</a>
+        </div>
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a href="{{ url_for('register_page') }}" class="button is-primary"><strong>Sign up</strong></a>
+                    <a href="{{ url_for('login_page') }}" class="button is-light">Log in</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+    <main class="content site-content">{% block content %}{% endblock %}</main>
+<footer class="footer site-footer">
+    <div class="content has-text-centered">
+        <p>© 2025 Car Retail. All rights reserved.</p>
+    </div>
+</footer>
+</body>
+</html>

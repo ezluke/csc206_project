@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - Details{% endblock %}
+
+{% block content %}
+<h2 class="title">{{ product.name or 'Part Details' }}</h2>
+
+<div class="box">
+	<div class="content">
+		<div class="field">
+			<label class="label">Part #</label>
+			<div class="control"><p>{{ product.name or '—' }}</p></div>
+		</div>
+
+		<div class="field">
+			<label class="label">Price</label>
+			<div class="control"><p>{% if product.price is not none %}{{ ('${:,.2f}'.format(product.price)) }}{% else %}—{% endif %}</p></div>
+		</div>
+
+		<div class="field">
+			<label class="label">Quantity</label>
+			<div class="control"><p>{{ product.quantity or '—' }}</p></div>
+		</div>
+
+		<div class="field">
+			<label class="label">Description</label>
+			<div class="control"><p>{{ product.description or 'No description.' }}</p></div>
+		</div>
+
+		<div class="field is-grouped">
+			<div class="control"><a class="button is-light" href="{{ back_url or url_for('parts') }}">Back to parts</a></div>
+		</div>
+	</div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Car Retail Home{% endblock %}
+
+{% block content %}
+<section class="section">
+	<div class="container">
+		<h2 class="title">Welcome to Car Retail</h2>
+		<p class="subtitle">Browse cars and parts available in inventory.</p>
+
+		<div class="buttons">
+			<a class="button is-link" href="{{ url_for('cars') }}">View Cars</a>
+			<a class="button is-light" href="{{ url_for('parts') }}">View Parts</a>
+		</div>
+	</div>
+</section>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Sales Productivity{% endblock %}
+
+{% block content %}
+<h2 class="title">Sales Productivity</h2>
+<table class="table is-fullwidth is-striped is-hoverable">
+    <thead>
+        <tr>
+            <th>Salesperson</th>
+            <th>Vehicles Sold</th>
+            <th>Total Sold Price</th>
+            <th>Avg Sale Price</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for r in rows %}
+        <tr>
+            <td>{{ r.salesperson }}</td>
+            <td>{{ r.vehicles_sold }}</td>
+            <td>${{ r.total_sold_price }}</td>
+            <td>{% if r.avg_sale_price %}${{ r.avg_sale_price }}{% else %}—{% endif %}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

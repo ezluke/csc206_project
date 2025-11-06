@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Part Statistics{% endblock %}
+
+{% block content %}
+<h2 class="title">Part Statistics by Vendor</h2>
+<table class="table is-fullwidth is-striped is-hoverable">
+    <thead>
+        <tr>
+            <th>Vendor</th>
+            <th>Parts Purchased</th>
+            <th>Total Spent</th>
+            <th>Avg Cost/Part</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for r in rows %}
+        <tr>
+            <td>{{ r.vendor_name }}</td>
+            <td>{{ r.parts_purchased }}</td>
+            <td>${{ r.total_spent }}</td>
+            <td>{% if r.avg_cost_per_part %}${{ r.avg_cost_per_part }}{% else %}-{% endif %}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

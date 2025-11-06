@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Success{% endblock %}
+
+{% block content %}
+<div class="box">
+	<h2 class="title">Success</h2>
+	<div class="content">
+		<p>{{ message or 'Operation completed.' }}</p>
+		<div class="field">
+			<a class="button is-link" href="{{ url_for('cars') }}">Back to Cars</a>
+			<a class="button is-light" href="{{ url_for('parts') }}">Back to Parts</a>
+		</div>
+	</div>
+</div>
+{% endblock %}

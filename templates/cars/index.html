@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Cars - Car Retail{% endblock %}
+
+{% block content %}
+<h2 class="title">Cars</h2>
+
+<!-- Client-side search: filters the displayed table rows in-browser (no server requests) -->
+<div class="box">
+	<div class="field">
+		<label class="label" for="client_search">Search displayed vehicles</label>
+		<div class="control">
+			<input id="client_search" class="input" type="search" placeholder="Type to filter the visible vehicles (model, manufacturer, year, fuel, etc.)" aria-label="Search displayed vehicles">
+		</div>
+	</div>
+</div>
+
+<form method="get" action="{{ url_for('cars') }}" class="box">
+	<div class="columns is-multiline is-variable is-1">
+
+		<div class="column is-6-tablet is-3-desktop">
+			<div class="field">
+				<label class="label" for="manufacturer_id">Manufacturer</label>
+				<div class="control">
+					<div class="select is-fullwidth">
+						<select name="manufacturer_id" id="manufacturer_id">
+							<option value="" {% if current_filters.manufacturer_id == '' %}selected{% endif %}>any</option>
+							{% for m in manufacturers %}
+							<option value="{{ m.manufacturerID }}" {% if current_filters.manufacturer_id == (m.manufacturerID|string) %}selected{% endif %}>{{ m.manufacturer_name }}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="column is-6-tablet is-3-desktop">
+			<div class="field">
+				<label class="label" for="vehicle_type_id">Type</label>
+				<div class="control">
+					<div class="select is-fullwidth">
+						<select name="vehicle_type_id" id="vehicle_type_id">
+							<option value="" {% if current_filters.vehicle_type_id == '' %}selected{% endif %}>any</option>
+							{% for vt in vehicle_types %}
+							<option value="{{ vt.vehicle_typeID }}" {% if current_filters.vehicle_type_id == (vt.vehicle_typeID|string) %}selected{% endif %}>{{ vt.vehicle_type_name }}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="column is-6-tablet is-2-desktop">
+			<div class="field">
+				<label class="label" for="model_year">Year</label>
+				<div class="control">
+					<div class="select is-fullwidth">
+						<select name="model_year" id="model_year">
+							<option value="" {% if current_filters.model_year == '' %}selected{% endif %}>any</option>
+							{% for my in model_year %}
+							<option value="{{ my }}" {% if current_filters.model_year == (my|string) %}selected{% endif %}>{{ my }}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="column is-6-tablet is-2-desktop">
+			<div class="field">
+				<label class="label" for="fuel_types">Fuel</label>
+				<div class="control">
+					<div class="select is-fullwidth">
+						<select name="fuel_type" id="fuel_types">
+							<option value="" {% if current_filters.fuel_type == '' %}selected{% endif %}>any</option>
+							{% for ft in fuel_types %}
+							<option value="{{ ft }}" {% if current_filters.fuel_type == ft %}selected{% endif %}>{{ ft }}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="column is-6-tablet is-2-desktop">
+			<div class="field">
+				<label class="label" for="color_id">Color</label>
+				<div class="control">
+					<div class="select is-fullwidth">
+						<select name="color_id" id="color_id">
+							<option value="" {% if current_filters.color_id == '' %}selected{% endif %}>any</option>
+							{% for c in colors %}
+							<option value="{{ c.colorID }}" {% if current_filters.color_id == (c.colorID|string) %}selected{% endif %}>{{ c.color_name }}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="column is-12">
+			<div class="field is-grouped is-justify-content-flex-end">
+				<div class="control">
+					<button class="button is-link" type="submit">Filter</button>
+				</div>
+				<div class="control">
+					<a class="button is-light" href="{{ url_for('cars') }}">Reset</a>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</form>
+
+<div class="table-container">
+	<table id="cars_table" class="table is-fullwidth is-striped is-hoverable">
+		<thead>
+			<tr>
+				<th>VIN</th>
+				<th>Vehicle Type</th>
+				<th>Model Year</th>
+				<th>Manufacturer</th>
+				<th>Model Name</th>
+				<th>Color(s)</th>
+				<th>Sales Price</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+
+			{% for p in products %}
+			<tr>
+				<td>{{ p.vin or '—' }}</td>
+				<td>{{ p.vehicle_type_name or 'Unknown' }}</td>
+				<td>{{ p.model_year or '—' }}</td>
+				<td>{{ p.manufacturer_name or 'Unknown' }}</td>
+				<td><a href="{{ url_for('car_detail', car_id=p.vehicleID) }}">{{ p.model_name }}</a></td>
+				<td>{{ p.colors or '—' }}</td>
+				<td>
+					{% if p.sales_price is not none %}
+						{{ ('${:,.2f}'.format(p.sales_price)) }}
+					{% else %}
+						—
+					{% endif %}
+				</td>
+				<td class="has-text-right"><a class="button is-small is-light" href="{{ url_for('car_detail', car_id=p.vehicleID) }}">Details</a></td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+    
+<script>
+// Client-side filtering for the Cars table. Filters visible rows by substring match across the row text.
+;(function(){
+	const input = document.getElementById('client_search');
+	const table = document.getElementById('cars_table');
+	if (!input || !table) return;
+
+	const tbody = table.tBodies[0];
+	if (!tbody) return;
+
+	// Simple debounce
+	function debounce(fn, wait){
+		let t = null;
+		return function(...args){
+			clearTimeout(t);
+			t = setTimeout(()=> fn.apply(this, args), wait);
+		};
+	}
+
+	function filterRows(){
+		const q = input.value.trim().toLowerCase();
+		// if empty -> show all
+		if (!q){
+			for (const r of tbody.rows) r.style.display = '';
+			return;
+		}
+
+		for (const row of tbody.rows){
+			// Search across visible text in the row
+			const text = row.textContent.toLowerCase();
+			row.style.display = text.indexOf(q) !== -1 ? '' : 'none';
+		}
+	}
+
+	input.addEventListener('input', debounce(filterRows, 150));
+
+	// Optional: allow Esc to clear the search
+	input.addEventListener('keydown', function(e){
+		if (e.key === 'Escape'){
+			input.value = '';
+			filterRows();
+		}
+	});
+})();
+</script>
+
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ car.model_name }} - Details{% endblock %}
+
+{% block content %}
+<h2 class="title">{{ car.model_name or 'Vehicle Details' }}</h2>
+
+<div class="box">
+	<div class="content">
+		<div class="field">
+			<label class="label">VIN</label>
+			<div class="control"><p class="is-family-monospace">{{ car.vin or '—' }}</p></div>
+		</div>
+
+		<div class="field">
+			<label class="label">Vehicle Type</label>
+			<div class="control"><p>{{ car.vehicle_type_name or 'Unknown' }}</p></div>
+		</div>
+
+		<div class="field">
+			<label class="label">Model Year</label>
+			<div class="control"><p>{{ car.model_year or '—' }}</p></div>
+		</div>
+
+		<div class="field">
+			<label class="label">Manufacturer</label>
+			<div class="control"><p>{{ car.manufacturer_name or 'Unknown' }}</p></div>
+		</div>
+
+		<div class="field">
+			<label class="label">Model Name</label>
+			<div class="control"><p>{{ car.model_name or '—' }}</p></div>
+		</div>
+
+		<div class="field">
+			<label class="label">Color(s)</label>
+			<div class="control"><p>{{ car.colors or '—' }}</p></div>
+		</div>
+
+		<div class="field">
+			<label class="label">Sales Price</label>
+			<div class="control">
+				<p>
+				{% if car.sales_price is not none %}
+					{{ ('${:,.2f}'.format(car.sales_price)) }}
+				{% else %}
+					—
+				{% endif %}
+				</p>
+			</div>
+		</div>
+
+		<div class="field">
+			<label class="label">Description</label>
+			<div class="control"><p>{{ car.description or 'No description available.' }}</p></div>
+		</div>
+
+		<div class="field is-grouped">
+			<div class="control">
+				<a class="button is-light" href="{{ url_for('cars') }}">Back to list</a>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

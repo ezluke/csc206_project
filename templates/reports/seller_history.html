@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Seller History{% endblock %}
+
+{% block content %}
+<h2 class="title">Seller History</h2>
+<table class="table is-fullwidth is-striped is-hoverable">
+    <thead>
+        <tr>
+            <th>Seller</th>
+            <th>Vehicles Sold to Dealer</th>
+            <th>Total Paid</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for r in rows %}
+        <tr>
+            <td>{{ r.seller_name }}</td>
+            <td>{{ r.vehicles_sold_to_dealer }}</td>
+            <td>${{ r.total_paid }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

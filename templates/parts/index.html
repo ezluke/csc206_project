@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Parts - Car Retail{% endblock %}
+
+{% block content %}
+<h2 class="title">Parts</h2>
+
+<div class="box">
+	{% if products %}
+	<div class="table-container">
+		<table class="table is-fullwidth is-striped is-hoverable">
+			<thead>
+				<tr>
+					<th>Part #</th>
+					<th>Description</th>
+					<th>Quantity</th>
+					<th>Cost</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for p in products %}
+				<tr>
+					<td>{{ p.part_number or ('#'+(p.partID|string)) }}</td>
+					<td>{{ p.description or '—' }}</td>
+					<td>{{ p.quantity or '—' }}</td>
+					<td>{% if p.cost is not none %}{{ ('${:,.2f}'.format(p.cost)) }}{% else %}—{% endif %}</td>
+					<td class="has-text-right"><a class="button is-small is-light" href="{{ url_for('part_detail', part_id=p.partID) }}">Details</a></td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+	{% else %}
+		<p>No parts available.</p>
+	{% endif %}
+</div>
+{% endblock %}
