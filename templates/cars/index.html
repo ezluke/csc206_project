@@ -15,6 +15,10 @@
 	</div>
 </div>
 
+<a href="{{ url_for('cars', get_all='0' if request.args.get('get_all')=='1' else '1') }}">
+    <button>Toggle All cars</button>
+</a>
+
 <form method="get" action="{{ url_for('cars') }}" class="box">
 	<div class="columns is-multiline is-variable is-1">
 

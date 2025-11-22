@@ -35,6 +35,12 @@ def cars():
     model_year_raw = request.args.get('model_year')
     fuel_type_raw = request.args.get('fuel_type')
     color_id_raw = request.args.get('color_id')
+    get_all_raw = request.args.get('get_all')
+
+    if get_all_raw == None or get_all_raw == '0':
+        get_all_raw = False
+    else:
+        get_all_raw = True
 
     # Build a filters dict for the query layer (convert to ints where appropriate)
     filters = {}
@@ -61,7 +67,7 @@ def cars():
     except ValueError:
         pass
 
-    cars = get_vehicles(filters if filters else None)
+    cars = get_vehicles(filters if filters else None, get_all_raw)
 
     filters = filter_data()
     # Provide dropdown values and echo-filter values for the template

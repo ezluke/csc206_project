@@ -113,7 +113,7 @@ def insert_part(part_number: str, description: str | None, cost: float | None, q
 def get_users():
     return execute_sql("SELECT * FROM users;")
 
-def get_vehicles(filters: dict | None = None):
+def get_vehicles(filters: dict | None = None, get_all = False):
     """
     Return vehicle rows enriched with manufacturer and vehicle type names for display.
 
@@ -168,6 +168,9 @@ def get_vehicles(filters: dict | None = None):
     # Aggregate colors (concatenate multi-colors into a single field) and compute
     # parts cost and sales price. Sales price = 140% of purchase price + 120% of parts cost.
     # Use LEFT JOINs so vehicles without purchase records still appear (sales_price NULL).
+
+    if (get_all):
+        where_sql = ''
     query = (
         "SELECT v.vehicleID, v.vin, v.mileage, v.description, v.model_name, v.model_year, v.fuel_type, "
         "v.manufacturerID, m.manufacturer_name, v.vehicle_typeID, vt.vehicle_type_name, "
