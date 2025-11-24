@@ -35,10 +35,17 @@
         </div>
         <div class="navbar-end">
             <div class="navbar-item">
-                <div class="buttons">
-                    <a href="{{ url_for('register_page') }}" class="button is-primary"><strong>Sign up</strong></a>
-                    <a href="{{ url_for('login_page') }}" class="button is-light">Log in</a>
-                </div>
+                {% if session.get('email') %}
+                    <div class="buttons">
+                        <span class="navbar-item">Welcome, {{ session.get('email') }} ({{ session.get('role') }})</span>
+                        <a href="{{ url_for('logout') }}" class="button is-danger">Logout</a>
+                    </div>
+                {% else %}
+                    <div class="buttons">
+                        <a href="{{ url_for('register_page') }}" class="button is-primary"><strong>Sign up</strong></a>
+                        <a href="{{ url_for('login_page') }}" class="button is-light">Log in</a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </nav>

@@ -9,11 +9,17 @@
             <div class="column is-4">
                 <div class="box">
                     <h1 class="title has-text-centered">Login</h1>
+                    {% if error %}
+                    <div class="notification is-danger">
+                        <button class="delete" onclick="this.parentElement.style.display='none'"></button>
+                        {{ error }}
+                    </div>
+                    {% endif %}
                     <form method="post" action="#">
                         <div class="field">
                             <label class="label">Email</label>
                             <div class="control">
-                                <input class="input" type="email" name="email" placeholder="Email">
+                                <input class="input" name="email_address" placeholder="Email">
                             </div>
                         </div>
                         <div class="field">
@@ -24,7 +30,7 @@
                         </div>
                         <div class="field">
                             <div class="control">
-                                <button class="button is-primary is-fullwidth">Login</button>
+                                <button type="submit" class="button is-primary is-fullwidth">Login</button>
                             </div>
                         </div>
                     </form>

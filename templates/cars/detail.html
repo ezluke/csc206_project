@@ -55,6 +55,96 @@
 			<div class="control"><p>{{ car.description or 'No description available.' }}</p></div>
 		</div>
 
+		{% if session.get('role') in ['Sales', 'Owner'] %}
+		<div class="field">
+			<div class="control">
+				<!-- Placeholder for Sell Vehicle functionality -->
+				<button class="button is-success">Sell Vehicle</button>
+			</div>
+		</div>
+		{% endif %}
+
+		{% if session.get('role') in ['Buyer', 'Owner'] %}
+		<div class="field">
+			<div class="control">
+				<a class="button is-primary" href="{{ url_for('sell_car') }}">Buy Vehicle</a>
+			</div>
+		</div>
+		{% endif %}
+
+		{% if session.get('role') in ['Owner', 'Buyer'] %}
+		<hr>
+		<h3 class="title is-4">Repair Parts</h3>
+		{% if parts %}
+		<table class="table is-fullwidth is-striped">
+			<thead>
+				<tr>
+					<th>Part #</th>
+					<th>Description</th>
+					<th>Vendor</th>
+					<th>Status</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for part in parts %}
+				<tr>
+					<td>{{ part.part_number }}</td>
+					<td>{{ part.description }}</td>
+					<td>{{ part.vendor_name }}</td>
+					<td>
+						<span class="tag {% if part.status == 'Installed' %}is-success{% else %}is-warning{% endif %}">
+							{{ part.status }}
+						</span>
+					</td>
+					<td>
+						{% if part.status == 'Ordered' %}
+						<form action="{{ url_for('install_part', part_id=part.partID) }}" method="post">
+							<button type="submit" class="button is-small is-primary">Mark Installed</button>
+						</form>
+						{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		{% else %}
+		<p>No parts ordered for this vehicle.</p>
+		{% endif %}
+		{% endif %}
+
+		{% if session.get('role') == 'Owner' and transactions %}
+		<hr>
+		<h3 class="title is-4">Transaction History</h3>
+		<div class="columns">
+			<div class="column">
+				<h4 class="subtitle is-5">Seller Info (Bought From)</h4>
+				{% if transactions.seller %}
+				<p><strong>Name:</strong> {{ transactions.seller.first_name }} {{ transactions.seller.last_name }}</p>
+				<p><strong>Email:</strong> {{ transactions.seller.email_address }}</p>
+				<p><strong>Phone:</strong> {{ transactions.seller.phone_number }}</p>
+				<p><strong>Address:</strong> {{ transactions.seller.street }}, {{ transactions.seller.city }}, {{ transactions.seller.state }} {{ transactions.seller.postal_code }}</p>
+				<p><strong>Purchase Date:</strong> {{ transactions.seller.purchase_date }}</p>
+				<p><strong>Purchase Price:</strong> ${{ '{:,.2f}'.format(transactions.seller.purchase_price) }}</p>
+				{% else %}
+				<p>No purchase record found.</p>
+				{% endif %}
+			</div>
+			<div class="column">
+				<h4 class="subtitle is-5">Buyer Info (Sold To)</h4>
+				{% if transactions.buyer %}
+				<p><strong>Name:</strong> {{ transactions.buyer.first_name }} {{ transactions.buyer.last_name }}</p>
+				<p><strong>Email:</strong> {{ transactions.buyer.email_address }}</p>
+				<p><strong>Phone:</strong> {{ transactions.buyer.phone_number }}</p>
+				<p><strong>Address:</strong> {{ transactions.buyer.street }}, {{ transactions.buyer.city }}, {{ transactions.buyer.state }} {{ transactions.buyer.postal_code }}</p>
+				<p><strong>Sale Date:</strong> {{ transactions.buyer.sales_date }}</p>
+				{% else %}
+				<p>Vehicle has not been sold yet.</p>
+				{% endif %}
+			</div>
+		</div>
+		{% endif %}
+
 		<div class="field is-grouped">
 			<div class="control">
 				<a class="button is-light" href="{{ url_for('cars') }}">Back to list</a>

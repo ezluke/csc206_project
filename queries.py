@@ -1,5 +1,8 @@
 from db import get_connection
 
+def add_user(email: str, password: str, role: str | None, first_name: str | None, last_name: str | None):
+    query = "INSERT INTO users (username, password, role, first_name, last_name) VALUES (%s, %s, %s, %s, %s)"
+    return execute_write(query, (email, password, role, first_name, last_name))
 
 def execute_sql(query: str, params: tuple = ()):
     conn = get_connection()
@@ -10,6 +13,11 @@ def execute_sql(query: str, params: tuple = ()):
     conn.close()
     return results
 
+def authenticate_user(email: str, password: str):
+    """Return user record if email/password match, else None."""
+    query = "SELECT * FROM users WHERE username = %s AND password = %s"
+    results = execute_sql(query, (email, password))
+    return results[0] if results else None
 
 
 def execute_write(query: str, params: tuple = ()): 
@@ -247,4 +255,45 @@ def get_part_statistics():
         "ORDER BY parts_purchased DESC;"
     )
     return execute_sql(query)
+
+
+def get_vehicle_parts(vehicle_id: int):
+    """Return all parts ordered for a specific vehicle."""
+    query = (
+        "SELECT p.partID, p.part_number, p.description, p.cost, p.quantity, p.status, v.vendor_name "
+        "FROM parts p "
+        "JOIN partorders po ON p.part_orderID = po.part_orderID "
+        "LEFT JOIN vendors v ON po.vendorID = v.vendorID "
+        "WHERE po.vehicleID = %s"
+    )
+    return execute_sql(query, (vehicle_id,))
+
+def get_vehicle_transactions(vehicle_id: int):
+    """Return seller (purchase tx) and buyer (sales tx) info for a vehicle."""
+    # Seller info (who we bought it from)
+    seller_query = (
+        "SELECT c.first_name, c.last_name, c.email_address, c.phone_number, c.street, c.city, c.state, c.postal_code, pt.purchase_date, pt.purchase_price "
+        "FROM purchasetransactions pt "
+        "JOIN customers c ON pt.customerID = c.customerID "
+        "WHERE pt.vehicleID = %s"
+    )
+    seller = execute_sql(seller_query, (vehicle_id,))
+    
+    # Buyer info (who we sold it to)
+    buyer_query = (
+        "SELECT c.first_name, c.last_name, c.email_address, c.phone_number, c.street, c.city, c.state, c.postal_code, st.sales_date "
+        "FROM salestransactions st "
+        "JOIN customers c ON st.customerID = c.customerID "
+        "WHERE st.vehicleID = %s"
+    )
+    buyer = execute_sql(buyer_query, (vehicle_id,))
+    
+    return {
+        'seller': seller[0] if seller else None,
+        'buyer': buyer[0] if buyer else None
+    }
+
+def update_part_status(part_id: int, status: str):
+    query = "UPDATE parts SET status = %s WHERE partID = %s"
+    return execute_write(query, (status, part_id))
 

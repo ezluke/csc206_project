@@ -1,4 +1,5 @@
-from flask import Flask, render_template, url_for, jsonify, redirect
+from flask import Flask, render_template, url_for, jsonify, redirect, render_template_string, request, session
+from datetime import timedelta
 from queries import (
     get_vehicles,
     get_parts,
@@ -14,10 +15,22 @@ from queries import (
     get_sales_productivity,
     get_seller_history,
     get_part_statistics,
+    authenticate_user,
+    add_user,
+    get_vehicle_parts,
+    get_vehicle_transactions,
+    update_part_status
 )
+
+
+
+
+
 
 app = Flask(__name__)
 
+app.secret_key = 'BAD_SECRET_KEY'
+app.permanent_session_lifetime = timedelta(minutes=60)
 
 @app.route('/')
 def home():
@@ -68,6 +81,9 @@ def cars():
         pass
 
     cars = get_vehicles(filters if filters else None, get_all_raw)
+    
+    if session.get('role') == 'Owner':
+        cars = get_vehicles(filters if filters else None, True)
 
     filters = filter_data()
     # Provide dropdown values and echo-filter values for the template
@@ -115,8 +131,29 @@ def car_detail(car_id):
     car = get_vehicle_details(car_id)
     if not car:
         return "Car not found", 404
+    
+    # Fetch additional data based on role
+    # Always fetch parts, let template decide visibility
+    parts = get_vehicle_parts(car_id)
+    
+    transactions = None
+    role = session.get('role')
+        
+    if role == 'Owner':
+        transactions = get_vehicle_transactions(car_id)
+
     # Render car-specific detail template (now under cars/ folder)
-    return render_template('cars/detail.html', car=car, back_url=url_for('cars'))
+    return render_template('cars/detail.html', car=car, parts=parts, transactions=transactions, back_url=url_for('cars'))
+
+
+@app.route('/part/<int:part_id>/install', methods=['POST'])
+def install_part(part_id):
+    if session.get('role') not in ['Buyer', 'Owner']:
+        return "Unauthorized", 403
+    
+    update_part_status(part_id, 'Installed')
+    # Redirect back to the referring page (the car detail page)
+    return redirect(request.referrer or url_for('cars'))
 
 
 @app.route('/part/<int:part_id>')
@@ -136,14 +173,71 @@ def part_detail(part_id):
     return render_template('parts/detail.html', product=product, back_url=url_for('parts'))
 
 
-@app.route('/login')
+
+
+@app.route('/login', methods=['GET', 'POST'])
 def login_page():
-    return render_template('auth/login.html')
+    error = None
+    if request.method == 'POST':
+
+        #test to see if user is in database
+        email = request.form.get('email_address')
+        password = request.form.get('password')
+
+        if not email or not password:
+            error = "Please enter both email and password."
+        else:
+            user = authenticate_user(email, password)
+
+            if user:
+                # Create a permanent session (True)
+                session.permanent = False
+                # Save the form data to the session object
+                session['email'] = request.form['email_address']
+                role = user.get('role')
+                session['role'] = role.strip() if role else None
+                return redirect('/')
+            else:
+                error = "Invalid email or password."
+            
+    return render_template('auth/login.html', error=error)
 
 
-@app.route('/register')
+
+
+@app.route('/register', methods=['GET', 'POST'])
 def register_page():
-    return render_template('auth/register.html')
+    error = None
+    if request.method == 'POST':
+
+        #test to see if user is in database
+        email = request.form.get('username')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+
+        if not email or not password or not first_name or not last_name:
+            error = "All fields are required."
+        elif password != confirm_password:
+            error = "Passwords do not match."
+        else:
+            try:
+                user_id = add_user(email, password, 'Sales', first_name, last_name)
+                if user_id:
+                    # Create a permanent session (True)
+                    session.permanent = False
+                    # Save the form data to the session object
+                    session['email'] = email
+                    return redirect('/')
+                else:
+                    error = "Registration failed. Please try again."
+            except Exception as e:
+                # Likely a duplicate username or database error
+                print(f"Registration error: {e}")
+                error = "Username already exists or database error occurred."
+
+    return render_template('auth/register.html', error=error)
 
 
 @app.route('/cars/sell', methods=['GET', 'POST'])
@@ -201,6 +295,12 @@ def sell_part():
         pid = insert_part(part_number, description, float(cost) if cost else None, int(quantity) if quantity else None)
     return render_template('sell/sell_success.html', message='Part listed for sale!')
     return render_template('sell/sell_part.html')
+
+
+@app.route('/logout')
+def logout():
+    session.pop('email', None)
+    return redirect(url_for('home'))
 
 
 if __name__ == '__main__':

@@ -5,23 +5,75 @@
 {% block content %}
 <div class="box">
 	<h2 class="title">Create an account</h2>
+	{% if error %}
+	<div class="notification is-danger">
+		<button class="delete" onclick="this.parentElement.style.display='none'"></button>
+		{{ error }}
+	</div>
+	{% endif %}
 	<form method="post" action="{{ url_for('register_page') }}">
+		<div class="field">
+			<label class="label">First Name</label>
+			<div class="control"><input class="input" type="text" name="first_name" required></div>
+		</div>
+		<div class="field">
+			<label class="label">Last Name</label>
+			<div class="control"><input class="input" type="text" name="last_name" required></div>
+		</div>
 		<div class="field">
 			<label class="label">Username</label>
 			<div class="control"><input class="input" type="text" name="username" required></div>
 		</div>
 		<div class="field">
 			<label class="label">Password</label>
-			<div class="control"><input class="input" type="password" name="password" required></div>
+			<div class="control"><input id="password" class="input" type="password" name="password" required></div>
 		</div>
 		<div class="field">
 			<label class="label">Confirm Password</label>
-			<div class="control"><input class="input" type="password" name="confirm_password" required></div>
+			<div class="control has-icons-right">
+				<input id="confirm_password" class="input" type="password" name="confirm_password" required>
+				<span class="icon is-small is-right" id="match-icon" style="display: none;">
+					<i class="fas fa-check"></i>
+				</span>
+			</div>
+			<p class="help is-danger" id="password-message" style="display: none;">Passwords do not match</p>
 		</div>
 		<div class="field is-grouped">
-			<div class="control"><button class="button is-link" type="submit">Register</button></div>
+			<div class="control"><button id="submit-btn" class="button is-link" type="submit">Register</button></div>
 			<div class="control"><a class="button is-light" href="{{ url_for('login_page') }}">Sign in</a></div>
 		</div>
 	</form>
 </div>
+
+<script>
+	const password = document.getElementById('password');
+	const confirm = document.getElementById('confirm_password');
+	const message = document.getElementById('password-message');
+	const submitBtn = document.getElementById('submit-btn');
+	const matchIcon = document.getElementById('match-icon');
+
+	function checkPasswordMatch() {
+		if (confirm.value && password.value !== confirm.value) {
+			confirm.classList.add('is-danger');
+			confirm.classList.remove('is-success');
+			message.style.display = 'block';
+			matchIcon.style.display = 'none';
+			// Optional: disable submit
+			// submitBtn.disabled = true;
+		} else if (confirm.value) {
+			confirm.classList.remove('is-danger');
+			confirm.classList.add('is-success');
+			message.style.display = 'none';
+			matchIcon.style.display = 'none'; // Bulma doesn't have built-in check icon without FontAwesome, using color instead
+			// submitBtn.disabled = false;
+		} else {
+			confirm.classList.remove('is-danger');
+			confirm.classList.remove('is-success');
+			message.style.display = 'none';
+		}
+	}
+
+	password.addEventListener('input', checkPasswordMatch);
+	confirm.addEventListener('input', checkPasswordMatch);
+</script>
 {% endblock %}

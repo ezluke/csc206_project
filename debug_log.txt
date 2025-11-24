@@ -1,0 +1,2 @@
+DEBUG: Car 11, Role: Owner, Parts found: 12
+DEBUG: Car 11, Role: Owner, Parts found: 12
