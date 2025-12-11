@@ -22,6 +22,7 @@
             <a href="{{ url_for('home') }}" class="navbar-item option">Home</a>
             <a href="{{ url_for('cars') }}" class="navbar-item option">Cars</a>
             <a href="{{ url_for('parts') }}" class="navbar-item option">Parts</a>
+            {% if session.get('role') == 'Owner' %}
             <div class="navbar-item has-dropdown is-hoverable">
                 <a class="navbar-link">Reports</a>
                 <div class="navbar-dropdown">
@@ -30,14 +31,17 @@
                     <a class="navbar-item" href="{{ url_for('part_statistics_report') }}">Part Statistics</a>
                 </div>
             </div>
-            <a href="{{ url_for('sell_car') }}" class="navbar-item option">Sell Car</a>
-            <a href="{{ url_for('sell_part') }}" class="navbar-item option">Sell Part</a>
+            {% endif %}
+            {% if session.get('role') in ['Buyer', 'Owner'] %}
+            <a href="{{ url_for('sell_car') }}" class="navbar-item option">Buy Vehicle</a>
+            <a href="{{ url_for('sell_part') }}" class="navbar-item option">Buy Part</a>
+            {% endif %}
         </div>
         <div class="navbar-end">
             <div class="navbar-item">
                 {% if session.get('email') %}
                     <div class="buttons">
-                        <span class="navbar-item">Welcome, {{ session.get('email') }} ({{ session.get('role') }})</span>
+                        <span class="navbar-item">Welcome, {{ session.get('name') or session.get('email') }} ({{ session.get('role') }})</span>
                         <a href="{{ url_for('logout') }}" class="button is-danger">Logout</a>
                     </div>
                 {% else %}

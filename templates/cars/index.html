@@ -5,6 +5,12 @@
 {% block content %}
 <h2 class="title">Cars</h2>
 
+{% if session.get('role') in ['Buyer', 'Owner'] %}
+<div class="block">
+    <a class="button is-primary" href="{{ url_for('sell_car') }}">Buy Vehicle</a>
+</div>
+{% endif %}
+
 <!-- Client-side search: filters the displayed table rows in-browser (no server requests) -->
 <div class="box">
 	<div class="field">

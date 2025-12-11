@@ -79,7 +79,8 @@ def get_vehicle_details(vehicle_id: int):
         "GROUP_CONCAT(DISTINCT c.color_name ORDER BY c.color_name SEPARATOR ', ') AS colors, "
         "pt.purchase_price AS purchase_price, "
         "COALESCE(SUM(p.cost * p.quantity), 0) AS parts_cost, "
-        "CASE WHEN pt.purchase_price IS NOT NULL THEN ROUND(1.4 * pt.purchase_price + 1.2 * COALESCE(SUM(p.cost * p.quantity),0), 2) ELSE NULL END AS sales_price "
+        "CASE WHEN pt.purchase_price IS NOT NULL THEN ROUND(1.4 * pt.purchase_price + 1.2 * COALESCE(SUM(p.cost * p.quantity),0), 2) ELSE NULL END AS sales_price, "
+        "EXISTS (SELECT 1 FROM salestransactions st WHERE st.vehicleID = v.vehicleID) AS is_sold "
         "FROM vehicles v "
         "LEFT JOIN manufacturers m ON v.manufacturerID = m.manufacturerID "
         "LEFT JOIN vehicletypes vt ON v.vehicle_typeID = vt.vehicle_typeID "
@@ -121,7 +122,7 @@ def insert_part(part_number: str, description: str | None, cost: float | None, q
 def get_users():
     return execute_sql("SELECT * FROM users;")
 
-def get_vehicles(filters: dict | None = None, get_all = False):
+def get_vehicles(filters: dict | None = None, get_all = False, include_unready = False):
     """
     Return vehicle rows enriched with manufacturer and vehicle type names for display.
 
@@ -136,8 +137,11 @@ def get_vehicles(filters: dict | None = None, get_all = False):
     """
     where_clauses = [
         "NOT EXISTS (SELECT 1 FROM salestransactions s WHERE s.vehicleID = v.vehicleID)",
-        "NOT EXISTS (SELECT 1 FROM partorders po JOIN parts p ON p.part_orderID = po.part_orderID WHERE po.vehicleID = v.vehicleID AND COALESCE(p.status,'') <> 'Installed')",
     ]
+    
+    if not include_unready:
+        where_clauses.append("NOT EXISTS (SELECT 1 FROM partorders po JOIN parts p ON p.part_orderID = po.part_orderID WHERE po.vehicleID = v.vehicleID AND COALESCE(p.status,'') <> 'Installed')")
+
     params: list = []
 
     if filters:
@@ -296,4 +300,13 @@ def get_vehicle_transactions(vehicle_id: int):
 def update_part_status(part_id: int, status: str):
     query = "UPDATE parts SET status = %s WHERE partID = %s"
     return execute_write(query, (status, part_id))
+
+
+def get_customers():
+    return execute_sql("SELECT * FROM customers ORDER BY last_name, first_name;")
+
+
+def add_customer(first_name, last_name, email, phone, street, city, state, zip_code, id_number):
+    query = "INSERT INTO customers (first_name, last_name, email_address, phone_number, street, city, state, postal_code, id_number) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    return execute_write(query, (first_name, last_name, email, phone, street, city, state, zip_code, id_number))
 

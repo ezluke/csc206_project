@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Sell {{ car.model_name }}{% endblock %}
+
+{% block content %}
+<h2 class="title">Sell Vehicle: {{ car.model_name }}</h2>
+
+<div class="box">
+    <div class="content">
+        <p><strong>VIN:</strong> {{ car.vin }}</p>
+        <p><strong>Price:</strong> {% if car.sales_price %}${{ '{:,.2f}'.format(car.sales_price) }}{% else %}N/A{% endif %}</p>
+    </div>
+
+    <form method="post">
+        <div class="field">
+            <label class="label">Customer</label>
+            <div class="control">
+                <div class="select">
+                    <select name="customer_id" required>
+                        <option value="">Select Customer</option>
+                        {% for c in customers %}
+                        <option value="{{ c.customerID }}" {% if new_customer_id and new_customer_id|int == c.customerID %}selected{% endif %}>{{ c.last_name }}, {{ c.first_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <p class="help">Customer not in list? <a href="{{ url_for('create_customer') }}">Create New Customer</a></p>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Sale Date</label>
+            <div class="control">
+                <input class="input" type="date" name="sales_date" required value="{{ today }}">
+            </div>
+        </div>
+
+        <div class="field is-grouped">
+            <div class="control"><button class="button is-success" type="submit">Complete Sale</button></div>
+            <div class="control"><a class="button is-light" href="{{ url_for('car_detail', car_id=car.vehicleID) }}">Cancel</a></div>
+        </div>
+    </form>
+</div>
+{% endblock %}

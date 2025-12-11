@@ -58,16 +58,11 @@
 		{% if session.get('role') in ['Sales', 'Owner'] %}
 		<div class="field">
 			<div class="control">
-				<!-- Placeholder for Sell Vehicle functionality -->
-				<button class="button is-success">Sell Vehicle</button>
-			</div>
-		</div>
-		{% endif %}
-
-		{% if session.get('role') in ['Buyer', 'Owner'] %}
-		<div class="field">
-			<div class="control">
-				<a class="button is-primary" href="{{ url_for('sell_car') }}">Buy Vehicle</a>
+				{% if car.is_sold %}
+					<button class="button is-success" disabled>Sold</button>
+				{% else %}
+					<a href="{{ url_for('sell_vehicle', car_id=car.vehicleID) }}" class="button is-success">Sell Vehicle</a>
+				{% endif %}
 			</div>
 		</div>
 		{% endif %}

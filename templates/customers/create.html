@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}New Customer - Car Retail{% endblock %}
+
+{% block content %}
+<h2 class="title">Create New Customer</h2>
+
+<div class="box">
+	<form method="post">
+		<div class="columns">
+			<div class="column">
+				<div class="field">
+					<label class="label">First Name</label>
+					<div class="control"><input class="input" name="first_name" required></div>
+				</div>
+			</div>
+			<div class="column">
+				<div class="field">
+					<label class="label">Last Name</label>
+					<div class="control"><input class="input" name="last_name" required></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="field">
+			<label class="label">Email</label>
+			<div class="control"><input class="input" name="email" type="email"></div>
+		</div>
+
+		<div class="field">
+			<label class="label">Phone</label>
+			<div class="control"><input class="input" name="phone" required></div>
+		</div>
+
+		<div class="field">
+			<label class="label">ID Number (Driver's License)</label>
+			<div class="control"><input class="input" name="id_number" required></div>
+		</div>
+
+		<div class="field">
+			<label class="label">Street Address</label>
+			<div class="control"><input class="input" name="street" required></div>
+		</div>
+
+		<div class="columns">
+			<div class="column">
+				<div class="field">
+					<label class="label">City</label>
+					<div class="control"><input class="input" name="city" required></div>
+				</div>
+			</div>
+			<div class="column">
+				<div class="field">
+					<label class="label">State</label>
+					<div class="control"><input class="input" name="state" required></div>
+				</div>
+			</div>
+			<div class="column">
+				<div class="field">
+					<label class="label">Zip Code</label>
+					<div class="control"><input class="input" name="zip_code" required></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="field is-grouped">
+			<div class="control"><button class="button is-link" type="submit">Create Customer</button></div>
+			<div class="control"><a class="button is-light" href="{{ request.referrer }}">Cancel</a></div>
+		</div>
+	</form>
+</div>
+{% endblock %}

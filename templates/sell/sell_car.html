@@ -8,6 +8,34 @@
 <div class="box">
 	<form method="post" action="{{ url_for('sell_car') }}">
 		<div class="field">
+			<label class="label">Manufacturer</label>
+			<div class="control">
+				<div class="select">
+					<select name="manufacturer_id">
+						<option value="">Select Manufacturer</option>
+						{% for m in manufacturers %}
+						<option value="{{ m.manufacturerID }}">{{ m.manufacturer_name }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+		</div>
+
+		<div class="field">
+			<label class="label">Vehicle Type</label>
+			<div class="control">
+				<div class="select">
+					<select name="vehicle_type_id">
+						<option value="">Select Type</option>
+						{% for vt in vehicle_types %}
+						<option value="{{ vt.vehicle_typeID }}">{{ vt.vehicle_type_name }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+		</div>
+
+		<div class="field">
 			<label class="label">Model Name</label>
 			<div class="control"><input class="input" name="model_name" required></div>
 		</div>
@@ -23,10 +51,59 @@
 			<label class="label">Mileage</label>
 			<div class="control"><input class="input" name="mileage" type="number"></div>
 		</div>
+		
 		<div class="field">
-			<label class="label">Price</label>
+			<label class="label">Fuel Type</label>
+			<div class="control">
+				<div class="select">
+					<select name="fuel_type">
+						<option value="">Select Fuel Type</option>
+						{% for ft in fuel_types %}
+						<option value="{{ ft }}">{{ ft }}</option>
+						{% endfor %}
+						<option value="Gasoline">Gasoline</option>
+						<option value="Diesel">Diesel</option>
+						<option value="Electric">Electric</option>
+						<option value="Hybrid">Hybrid</option>
+					</select>
+				</div>
+			</div>
+		</div>
+
+		<div class="field">
+			<label class="label">Purchase Price</label>
 			<div class="control"><input class="input" name="price" type="number" step="0.01"></div>
 		</div>
+
+		<div class="field">
+			<label class="label">Condition</label>
+			<div class="control">
+				<div class="select">
+					<select name="condition">
+						<option value="Excellent">Excellent</option>
+						<option value="Very Good">Very Good</option>
+						<option value="Good" selected>Good</option>
+						<option value="Fair">Fair</option>
+					</select>
+				</div>
+			</div>
+		</div>
+
+		<div class="field">
+			<label class="label">Seller (Customer)</label>
+			<div class="control">
+				<div class="select">
+					<select name="customer_id" required>
+						<option value="">Select Customer</option>
+						{% for c in customers %}
+						<option value="{{ c.customerID }}" {% if new_customer_id and new_customer_id|int == c.customerID %}selected{% endif %}>{{ c.last_name }}, {{ c.first_name }}</option>
+						{% endfor %}
+					</select>
+				</div>
+				<p class="help">Customer not in list? <a href="{{ url_for('create_customer') }}">Create New Customer</a></p>
+			</div>
+		</div>
+
 		<div class="field">
 			<label class="label">Description</label>
 			<div class="control"><textarea class="textarea" name="description"></textarea></div>
